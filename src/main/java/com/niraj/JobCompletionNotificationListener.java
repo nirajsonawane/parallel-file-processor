@@ -7,6 +7,7 @@ import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -15,6 +16,10 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 	private static final Logger log = LoggerFactory.getLogger(JobCompletionNotificationListener.class);
 
 	private final JdbcTemplate jdbcTemplate;
+	
+	@Autowired
+	private ThreadPoolTaskExecutor taskExecutor;
+	
 
 	@Autowired
 	public JobCompletionNotificationListener(JdbcTemplate jdbcTemplate) {
@@ -32,5 +37,7 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
 					rs.getString(2))
 			).forEach(person -> log.info("Found <" + person + "> in the database."));
 		}
+		taskExecutor.shutdown();
 	}
+	
 }
